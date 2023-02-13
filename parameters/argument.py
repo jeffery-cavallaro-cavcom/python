@@ -18,9 +18,9 @@ special meaning if specified:
                 converter; however, this can be overridden by specifying a
                 'type' keyword argument.
 
-Note that if the 'default' keyword argument is specified then it essentially
-overrides any parameter default value (since argument values have the highest
-priority).
+    default     If a default value is specified then this default value is used
+                as the default value for the parameter, overriding any default
+                value specified for the parameter.
 """
 
 from argparse import ArgumentParser, Namespace

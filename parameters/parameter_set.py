@@ -2,7 +2,7 @@
 Application Parameter Set
 """
 
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, SUPPRESS
+from argparse import ArgumentParser, SUPPRESS
 from configparser import ConfigParser, ExtendedInterpolation
 from typing import Any
 
@@ -55,11 +55,7 @@ class ParameterSet:
         kwargs = kwargs.copy()
         kwargs['add_help'] = False
 
-        if 'formatter_class' not in kwargs:
-            kwargs['formatter_class'] = ArgumentDefaultsHelpFormatter
-
         return ArgumentParser(**kwargs)
-
 
     def setup_help(self) -> None:
         """ Setup extended help """
