@@ -34,6 +34,7 @@ from configparser import ConfigParser
 from typing import Any, Callable, Optional, Union
 
 from parameters.argument import Argument
+from parameters.option import Option
 from parameters.env_variable import EnvVariable
 
 class Parameter:
@@ -42,7 +43,7 @@ class Parameter:
 
     name : str
     group : str
-    arg : Argument
+    arg : Union[Argument, Option]
     env : EnvVariable
     config : bool
     converter : Callable[[str], Any]
@@ -54,7 +55,7 @@ class Parameter:
         self,
         name : str,
         group : Optional[str] = None,
-        arg : Optional[Argument] = None,
+        arg : Optional[Union[Argument, Option]] = None,
         env : Optional[EnvVariable] = None,
         config : Optional[Union[bool, 'Parameter']] = False,
         converter : Optional[Callable[[str], Any]] = None,

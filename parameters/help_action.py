@@ -6,6 +6,7 @@ of recognized environment variables and configuration file parameters.
 """
 
 from argparse import Action, ArgumentParser, SUPPRESS
+import sys
 from typing import Any, ClassVar, Iterable
 
 from parameters.parameter import Parameter
@@ -62,4 +63,32 @@ class HelpAction(Action):
             kwargs:
                 Other keyword arguments (unused).
         """
+        env_help = []
+        config_help = []
+
+        parameters : Iterable[Parameter] = self.const
+
+        for parameter in parameters:
+            help_text = parameter.help_text or ''
+
+            if parameter.env:
+                env_name = parameter.env.get_name(
+                    parameter.name, parameter.group
+                )
+                env_help.append(f"  {env_name:<21s} {help_text:<s}")
+
+            if parameter.config:
+                config_name = parameter.get_full_name()
+                config_help.append(f"  {config_name:<21s} {help_text:<s}")
+
         parser.print_help()
+
+        if env_help:
+            print('\nenvironment variables:')
+            print('\n'.join(env_help))
+
+        if config_help:
+            print('\nconfiguration parameters:')
+            print('\n'.join(config_help))
+
+        sys.exit(0)
