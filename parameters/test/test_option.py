@@ -152,5 +152,17 @@ class TestArgument(ArgumentTest):
         self.assertEqual(values.math_pi, value)
         self.assertEqual(option.get_value(name, group, values), value)
 
+    def test_missing(self):
+        """ No option value returns None """
+        name = 'name'
+        group = 'group'
+
+        option = Option()
+        option.add_argument(name, group, self.parser, converter=int)
+
+        values = self.run_parser([])
+
+        self.assertIsNone(values.group_name)
+
 if __name__ == '__main__':
     unittest.main()

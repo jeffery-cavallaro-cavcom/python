@@ -141,7 +141,7 @@ class Argument:
                 'dest' argument override.
 
         Returns:
-            Parsed (and possible converted) argument valuee from the specified
+            Parsed (and possible converted) argument value from the specified
             argument parser namespace.
         """
         override_name = self.kwargs.get('dest', None)

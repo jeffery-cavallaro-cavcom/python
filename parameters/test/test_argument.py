@@ -88,5 +88,17 @@ class TestArgument(ArgumentTest):
         self.assertEqual(values.group_name, value)
         self.assertEqual(argument.get_value(name, group, values), value)
 
+    def test_missing(self):
+        """ No argument value returns None """
+        name = 'name'
+        group = 'group'
+
+        argument = Argument(nargs='?')
+        argument.add_argument(name, group, self.parser, converter=int)
+
+        values = self.run_parser([])
+
+        self.assertIsNone(values.group_name)
+
 if __name__ == '__main__':
     unittest.main()
