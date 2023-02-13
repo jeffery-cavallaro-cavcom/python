@@ -107,6 +107,25 @@ class TestParameter(ArgumentTest):
         self.assertEqual(parameter.help_text, full_text)
         self.assertEqual(parameter.arg.kwargs['help'], full_text)
 
+    def test_help_no_default(self):
+        """ Parameter supplies help text with no default value """
+        name = 'name'
+        group = 'group'
+        text = 'a dummy argument'
+
+        parameter = Parameter(
+            name,
+            group,
+            arg=Argument(),
+            help_text=text
+        )
+
+        self.assertIsNone(parameter.default)
+        self.assertNotIn('default', parameter.arg.kwargs)
+
+        self.assertEqual(parameter.help_text, text)
+        self.assertEqual(parameter.arg.kwargs['help'], text)
+
     def test_argument_no_converter(self):
         """ Get string argument value """
         parameter = Parameter(
