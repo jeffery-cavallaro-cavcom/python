@@ -10,6 +10,7 @@ name.
 """
 
 from argparse import ArgumentParser, Namespace, SUPPRESS
+from argparse import _ArgumentGroup, _MutuallyExclusiveGroup
 from configparser import ConfigParser, ExtendedInterpolation
 from pathlib import Path
 from sys import getdefaultencoding
@@ -24,7 +25,7 @@ from utility.expand_path import expand_path
 class ParameterSet:
     """ Application Parameter Set Definition """
     parameters : dict[str, Parameter]
-    groups : dict[str, Any]
+    groups : dict[str, Union[_ArgumentGroup, _MutuallyExclusiveGroup]]
     arguments : ArgumentParser
     config : ConfigParser
 
@@ -105,7 +106,7 @@ class ParameterSet:
 
             parent = None
             if isinstance(parameter.arg, Option):
-                parent = parameter.arg.help_or_mutex
+                parent = self.groups.get(parameter.arg.help_or_mutex, None)
             parent = parent or self.arguments
 
             parameter.add_argument(parent)

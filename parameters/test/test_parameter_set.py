@@ -4,6 +4,7 @@ Parameter Set Unit Tests
 
 import unittest
 
+from argparse import ArgumentError
 from os import environ
 from pathlib import Path
 from sys import getdefaultencoding
@@ -108,7 +109,9 @@ class TestParameterSet(unittest.TestCase):
 
     def setUp(self) -> None:
         """ Create parameter set """
-        self.parameters = ParameterSet(description='Test Parameters')
+        self.parameters = ParameterSet(
+            description='Test Parameters', exit_on_error=False
+        )
         self.parameters.add_parameters(self.PARAMETERS)
         self.filename = Path(__file__).parent / 'test.ini'
 
@@ -205,6 +208,72 @@ class TestParameterSet(unittest.TestCase):
         self.assertTrue(values['backup_verify'])
         self.assertEqual(values['math_pi'], 3.14159)
         self.assertEqual(values['math_euler'], 2.71828)
+
+    GROUPED : ClassVar[list[Parameter]] = [
+        Parameter(
+            name='one',
+            arg=Option(help_or_mutex='together'),
+            converter=int
+        ),
+        Parameter(
+            name='two',
+            arg=Option(help_or_mutex='apart'),
+            converter=int
+        ),
+        Parameter(
+            name='three',
+            arg=Option(help_or_mutex='together'),
+            converter=int
+        ),
+        Parameter(
+            name='four',
+            arg=Option(help_or_mutex='apart'),
+            converter=int
+        )
+    ]
+
+    def add_groups(self):
+        """ Add help and mutex groups """
+        self.parameters.add_help_group(
+            'together', title='alike', description='related values'
+        )
+        self.parameters.add_mutex_group('apart', required=False)
+
+        self.parameters.add_parameters(self.GROUPED)
+
+    def test_groups(self):
+        """ Help and mutex groups """
+        self.add_groups()
+
+        values = self.parameters.collect_values(
+            [
+                '--one', '1',
+                '--two', '2',
+                '--three', '3'
+            ]
+        )
+
+        self.assertEqual(values['one'], 1)
+        self.assertEqual(values['two'], 2)
+        self.assertEqual(values['three'], 3)
+
+    def test_conflict(self):
+        """ Specify conflicting options """
+        self.add_groups()
+
+        with self.assertRaises(ArgumentError) as error:
+            self.parameters.collect_values(
+                [
+                    '--one', '1',
+                    '--two', '2',
+                    '--four', '4'
+                ]
+            )
+
+        self.assertEqual(
+            str(error.exception),
+            'argument --four: not allowed with argument --two'
+        )
 
 if __name__ == '__main__':
     unittest.main()
