@@ -115,7 +115,7 @@ class ParameterSet:
     def collect_values(
         self,
         args : Optional[list[str]] = None,
-        source : Optional[Union[Path, Parameter, str]] = None
+        config : Optional[Union[Path, Parameter, str]] = None
     ) -> dict[str, Any]:
         """
         Parse and collect parameter values
@@ -123,7 +123,7 @@ class ParameterSet:
         Arguments:
             args:
                 Command line arguments.  Defaults to None (use sys.argv).
-            source:
+            config:
                 Configuration source.  If a Path then the configuration
                 information is read from the specified file.  If a Parameter
                 then the target configuration file name is specified by another
@@ -137,7 +137,7 @@ class ParameterSet:
         values = {}
 
         arguments = self.arguments.parse_args(args)
-        self.read_source(source, arguments)
+        self.read_source(config, arguments)
 
         for name, parameter in self.parameters.items():
             values[name] = parameter.get_value(arguments, self.config)
@@ -194,32 +194,32 @@ class ParameterSet:
             comment_prefixes='#',
             inline_comment_prefixes='#',
             empty_lines_in_values=False,
-            interpolation=ExtendedInterpolation
+            interpolation=ExtendedInterpolation()
         )
 
     def read_source(
         self,
-        source : Union[Path, Parameter, str],
+        config : Union[Path, Parameter, str],
         arguments : Namespace
     ) -> None:
         """
         Read and parse configuration data from source
 
         Arguments:
-            source:
+            config:
                 Configuration source (see above).
             arguments:
                 Parsed command line argument values.  Used when the
                 configuration file name is specified by another parameter.
         """
-        if isinstance(source, Parameter):
-            filename = source.get_value(arguments, self.config)
+        if isinstance(config, Parameter):
+            filename = config.get_value(arguments, self.config)
             if filename:
                 self.read_source_file(filename)
-        elif isinstance(source, Path):
-            self.read_source_file(source)
-        elif isinstance(source, str):
-            self.config.read_string(source)
+        elif isinstance(config, Path):
+            self.read_source_file(config)
+        elif isinstance(config, str):
+            self.config.read_string(config)
 
     def read_source_file(self, path : Path) -> None:
         """
@@ -230,5 +230,5 @@ class ParameterSet:
                 Input file to read.
         """
         filename = expand_path(path)
-        with open(filename, encoding=getdefaultencoding()) as source:
-            self.config.read_file(source)
+        with open(filename, encoding=getdefaultencoding()) as config:
+            self.config.read_file(config, source=str(filename))
